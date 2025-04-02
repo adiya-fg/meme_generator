@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Meme Generator with Draggable Text</title>
+  <!-- Responsive meta tag -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meme Generator with Enhanced Text</title>
   <!-- Favicon: Using an inline SVG with an emoji for a fun icon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>😂</text></svg>">
   <!-- Google Fonts: Importing the Bangers font -->
@@ -13,6 +15,7 @@
       text-align: center;
       padding: 20px;
       background: #f4f4f4;
+      margin: 0;
     }
     h1 {
       margin-bottom: 20px;
@@ -20,9 +23,16 @@
     .input-group {
       margin: 10px 0;
     }
+    /* Responsive canvas container */
+    #canvasContainer {
+      display: inline-block;
+      width: 100%;
+      max-width: 500px;
+    }
     #memeCanvas {
+      width: 100%;
+      height: auto;
       border: 1px solid #ccc;
-      margin-top: 20px;
       background: white;
       cursor: pointer;
     }
@@ -34,10 +44,16 @@
       padding: 10px 20px;
       font-size: 16px;
     }
+    @media (max-width: 600px) {
+      button {
+        width: 100%;
+        margin: 5px 0;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Meme Generator with Draggable Text</h1>
+  <h1>Meme Generator with Enhanced Text</h1>
   
   <!-- Image Upload -->
   <div class="input-group">
@@ -68,8 +84,10 @@
   <button id="generateMeme">Generate Meme</button>
   <button id="downloadMeme">Download Meme</button>
   
-  <!-- Canvas for Meme Preview -->
-  <canvas id="memeCanvas" width="500" height="500"></canvas>
+  <!-- Canvas for Meme Preview inside a responsive container -->
+  <div id="canvasContainer">
+    <canvas id="memeCanvas" width="500" height="500"></canvas>
+  </div>
   
   <script>
     const imageInput = document.getElementById('imageInput');
@@ -123,30 +141,45 @@
       return 'top'; // default
     }
 
-    // Draw Meme function
+    // Draw Meme function with enhanced text styling
     function drawMeme() {
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       // Draw the image
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
       
-      // Use the creative "Bangers" font for meme text
+      // Set text properties for creative styling
       ctx.font = 'bold 40px Bangers';
-      ctx.fillStyle = 'white';
-      ctx.strokeStyle = 'black';
-      ctx.lineWidth = 2;
       ctx.textAlign = 'center';
       
-      // Draw top text at its coordinates
+      // Apply drop shadow effect
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      ctx.shadowBlur = 4;
+      
+      // Create a horizontal gradient for text fill
+      let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+      gradient.addColorStop(0, "#ff6a00");
+      gradient.addColorStop(0.5, "#ee0979");
+      gradient.addColorStop(1, "#ff6a00");
+      
+      // Draw top text
       ctx.textBaseline = 'top';
       let topText = topTextInput.value.toUpperCase();
+      ctx.fillStyle = gradient;
       ctx.fillText(topText, topTextX, topTextY);
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 3;
       ctx.strokeText(topText, topTextX, topTextY);
-
-      // Draw bottom text at its coordinates
+      
+      // Draw bottom text
       ctx.textBaseline = 'bottom';
       let bottomText = bottomTextInput.value.toUpperCase();
+      ctx.fillStyle = gradient;
       ctx.fillText(bottomText, bottomTextX, bottomTextY);
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 3;
       ctx.strokeText(bottomText, bottomTextX, bottomTextY);
     }
 
