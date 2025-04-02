@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Meme Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .input-group {
+      margin: 10px 0;
+    }
+    #memeCanvas {
+      border: 1px solid #ccc;
+      margin-top: 20px;
+      background: white;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Meme Generator</h1>
+  
+  <!-- Image Upload -->
+  <div class="input-group">
+    <input type="file" id="imageInput" accept="image/*">
+  </div>
+  
+  <!-- Text Inputs -->
+  <div class="input-group">
+    <input type="text" id="topText" placeholder="Top Text">
+  </div>
+  <div class="input-group">
+    <input type="text" id="bottomText" placeholder="Bottom Text">
+  </div>
+  
+  <!-- Action Buttons -->
+  <button id="generateMeme">Generate Meme</button>
+  <button id="downloadMeme">Download Meme</button>
+  
+  <!-- Canvas for Meme Preview -->
+  <canvas id="memeCanvas" width="500" height="500"></canvas>
+  
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const topTextInput = document.getElementById('topText');
+    const bottomTextInput = document.getElementById('bottomText');
+    const generateButton = document.getElementById('generateMeme');
+    const downloadButton = document.getElementById('downloadMeme');
+    const canvas = document.getElementById('memeCanvas');
+    const ctx = canvas.getContext('2d');
+    let image = new Image();
+
+    // Load image from file input
+    imageInput.addEventListener('change', function() {
+      const file = imageInput.files[0];
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        image.src = event.target.result;
+        // Draw image as soon as it's loaded
+        image.onload = () => {
+          // Resize canvas based on image dimensions
+          canvas.width = image.width;
+          canvas.height = image.height;
+          drawMeme();
+        }
+      }
+      reader.readAsDataURL(file);
+    });
+
+    // Draw Meme function
+    function drawMeme() {
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Draw the image
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      
+      // Text styling
+      ctx.font = 'bold 40px Impact';
+      ctx.fillStyle = 'white';
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 2;
+      ctx.textAlign = 'center';
+
+      // Draw top text
+      ctx.textBaseline = 'top';
+      let topText = topTextInput.value.toUpperCase();
+      ctx.fillText(topText, canvas.width / 2, 10);
+      ctx.strokeText(topText, canvas.width / 2, 10);
+
+      // Draw bottom text
+      ctx.textBaseline = 'bottom';
+      let bottomText = bottomTextInput.value.toUpperCase();
+      ctx.fillText(bottomText, canvas.width / 2, canvas.height - 10);
+      ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 10);
+    }
+
+    // Generate Meme on button click
+    generateButton.addEventListener('click', drawMeme);
+
+    // Download Meme as image
+    downloadButton.addEventListener('click', function() {
+      const link = document.createElement('a');
+      link.download = 'meme.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  </script>
+</body>
+</html>
+
