@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Meme Generator</title>
+  <title>Meme Generator with Draggable Text</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -20,6 +20,10 @@
       border: 1px solid #ccc;
       margin-top: 20px;
       background: white;
+      cursor: pointer;
+    }
+    label {
+      margin-right: 10px;
     }
     button {
       margin: 10px;
@@ -29,7 +33,7 @@
   </style>
 </head>
 <body>
-  <h1>Meme Generator</h1>
+  <h1>Meme Generator with Draggable Text</h1>
   
   <!-- Image Upload -->
   <div class="input-group">
@@ -42,6 +46,18 @@
   </div>
   <div class="input-group">
     <input type="text" id="bottomText" placeholder="Bottom Text">
+  </div>
+
+  <!-- Radio Buttons to select active text for repositioning -->
+  <div class="input-group">
+    <label>
+      <input type="radio" name="activeText" value="top" checked>
+      Top Text
+    </label>
+    <label>
+      <input type="radio" name="activeText" value="bottom">
+      Bottom Text
+    </label>
   </div>
   
   <!-- Action Buttons -->
@@ -61,22 +77,47 @@
     const ctx = canvas.getContext('2d');
     let image = new Image();
 
+    // Variables to store text positions (default positions)
+    let topTextX = canvas.width / 2;
+    let topTextY = 10;
+    let bottomTextX = canvas.width / 2;
+    let bottomTextY = canvas.height - 10;
+
+    // Update the canvas size based on image dimensions
+    function updateCanvasSize() {
+      canvas.width = image.width;
+      canvas.height = image.height;
+      // Reset default text positions based on new canvas size
+      topTextX = canvas.width / 2;
+      topTextY = 10;
+      bottomTextX = canvas.width / 2;
+      bottomTextY = canvas.height - 10;
+    }
+
     // Load image from file input
     imageInput.addEventListener('change', function() {
       const file = imageInput.files[0];
       const reader = new FileReader();
       reader.onload = function(event) {
         image.src = event.target.result;
-        // Draw image as soon as it's loaded
         image.onload = () => {
-          // Resize canvas based on image dimensions
-          canvas.width = image.width;
-          canvas.height = image.height;
+          updateCanvasSize();
           drawMeme();
         }
       }
       reader.readAsDataURL(file);
     });
+
+    // Function to get selected text type (top or bottom)
+    function getActiveTextType() {
+      const radios = document.getElementsByName('activeText');
+      for (const radio of radios) {
+        if (radio.checked) {
+          return radio.value;
+        }
+      }
+      return 'top'; // default
+    }
 
     // Draw Meme function
     function drawMeme() {
@@ -91,22 +132,40 @@
       ctx.strokeStyle = 'black';
       ctx.lineWidth = 2;
       ctx.textAlign = 'center';
-
-      // Draw top text
+      
+      // Draw top text at its coordinates
       ctx.textBaseline = 'top';
       let topText = topTextInput.value.toUpperCase();
-      ctx.fillText(topText, canvas.width / 2, 10);
-      ctx.strokeText(topText, canvas.width / 2, 10);
+      ctx.fillText(topText, topTextX, topTextY);
+      ctx.strokeText(topText, topTextX, topTextY);
 
-      // Draw bottom text
+      // Draw bottom text at its coordinates
       ctx.textBaseline = 'bottom';
       let bottomText = bottomTextInput.value.toUpperCase();
-      ctx.fillText(bottomText, canvas.width / 2, canvas.height - 10);
-      ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 10);
+      ctx.fillText(bottomText, bottomTextX, bottomTextY);
+      ctx.strokeText(bottomText, bottomTextX, bottomTextY);
     }
 
     // Generate Meme on button click
     generateButton.addEventListener('click', drawMeme);
+
+    // Update text positions when clicking on the canvas
+    canvas.addEventListener('click', function(event) {
+      // Get canvas bounding rectangle to calculate click coordinates correctly
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const activeText = getActiveTextType();
+
+      if (activeText === 'top') {
+        topTextX = x;
+        topTextY = y;
+      } else {
+        bottomTextX = x;
+        bottomTextY = y;
+      }
+      drawMeme();
+    });
 
     // Download Meme as image
     downloadButton.addEventListener('click', function() {
@@ -118,4 +177,3 @@
   </script>
 </body>
 </html>
-
